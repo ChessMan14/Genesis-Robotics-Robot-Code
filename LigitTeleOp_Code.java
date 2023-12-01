@@ -33,6 +33,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /*
@@ -73,6 +75,14 @@ public class LigitTeleOp_Code extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
 
+    private DcMotor armDrive = null;
+
+    private Servo clawServo = null;
+
+    private Servo launcherServo = null;
+
+    private boolean clawActive = false;
+
     @Override
     public void runOpMode() {
 
@@ -83,11 +93,23 @@ public class LigitTeleOp_Code extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
 
+        //armDrive = hardwareMap.get(DcMotor.class, "arm_drive");
+
+        clawServo = hardwareMap.get(Servo.class, "claw_servo");
+
+        launcherServo = hardwareMap.get(Servo.class, "launcher_servo");
+
         //Set directions
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+
+        //armDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        //clawServo.setPosition(0);
+
+        launcherServo.setPosition(0.5);
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
@@ -99,6 +121,9 @@ public class LigitTeleOp_Code extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double max;
+            double speed = 0.4; //50% Speed
+
+            //double arm_speed = 0.5; //50% Speed
 
             //Use left joystick to go forward & strafe, and right joystick to rotate.
             double axial;  // Note: pushing stick forward gives negative value
@@ -157,6 +182,10 @@ public class LigitTeleOp_Code extends LinearOpMode {
                 rightFrontPower /= max;
                 leftBackPower /= max;
                 rightBackPower /= max;
+                leftFrontPower *= speed;
+                rightFrontPower *= speed;
+                leftBackPower *= speed;
+                rightBackPower *= speed;
             }
 
             // Send calculated power to wheels
@@ -165,10 +194,36 @@ public class LigitTeleOp_Code extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
+            //Arm stuff
+            /*double arm_movement = 0;
+            if (gamepad2.y) { //triggers give out a percentage or smth, but we only want to know if they are touched or note+
+                arm_movement++;
+            }
+            if (gamepad2.a) {
+                arm_movement--;
+            }
+            armDrive.setPower(arm_movement*arm_speed);
+            */
+            //Claw stuff
+            double claw_max = 1;
+            if (gamepad2.right_trigger > 0) {
+                clawServo.setPosition(claw_max);
+            }
+            else {
+                clawServo.setPosition(0.5);
+            }
+
+            //Launcher stuff
+            double launcher_max = 0;
+            if (gamepad2.x) {
+                launcherServo.setPosition(launcher_max);
+            }
+
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+            telemetry.addData("Claw Active", (clawActive ? "true" : "false"));
             telemetry.update();
         }
     }}
