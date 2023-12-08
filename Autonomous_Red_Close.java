@@ -60,7 +60,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Red CLose", group="Robot")
+@Autonomous(name="Red Close", group="Robot")
 public class Autonomous_Red_Close extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -88,10 +88,10 @@ public class Autonomous_Red_Close extends LinearOpMode {
     public void runOpMode() {
 
         // Initialize the drive system variables.
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "left_front_drive");
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+        leftFrontDrive  = hardwareMap.get(DcMotor.class, "front_left_motor");
+        leftBackDrive  = hardwareMap.get(DcMotor.class, "back_left_motor");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "front_right_motor");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "back_right_motor");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -121,7 +121,8 @@ public class Autonomous_Red_Close extends LinearOpMode {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDrive(DRIVE_SPEED,  -110,  110, 110, -110, 5.0);  // S1: Forward 48 Inches with 5 Sec timeout
+        encoderDrive(DRIVE_SPEED, 3, 3, 3, 3, 30.0);
+        encoderDrive(DRIVE_SPEED,  -36,  36, 36, -36, 30.0);  // S1: Forward 48 Inches with 5 Sec timeout
         //encoderDrive(TURN_SPEED,   12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
         //encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
 
@@ -178,8 +179,8 @@ public class Autonomous_Red_Close extends LinearOpMode {
             // However, if you require that BOTH motors have finished their moves before the robot continues
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
             while (opModeIsActive() &&
-                   (runtime.seconds() < timeoutS) &&
-                   (leftBackDrive.isBusy() && leftFrontDrive.isBusy() && rightFrontDrive.isBusy() && rightBackDrive.isBusy())) {
+                    (runtime.seconds() < timeoutS) &&
+                    (leftBackDrive.isBusy() && leftFrontDrive.isBusy() && rightFrontDrive.isBusy() && rightBackDrive.isBusy())) {
 
                 // Display it for the driver.
                 telemetry.addData("Running to",  " %7d :%7d :%7d :57d", newBackLeftTarget, newFrontLeftTarget, newBackRightTarget, newFrontRightTarget);
